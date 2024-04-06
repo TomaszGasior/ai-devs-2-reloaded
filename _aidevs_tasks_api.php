@@ -8,8 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Task
 {
-    private string $token;
-    private HttpClientInterface $httpClient;
+    protected string $token;
+    protected HttpClientInterface $httpClient;
 
     public function __construct(string $name)
     {
