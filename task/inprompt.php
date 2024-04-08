@@ -7,19 +7,17 @@ use Symfony\Component\HttpClient\HttpClient;
 
 $task = new Task('inprompt');
 
-$question = $task->getQuestion();
+$question = $task->getParam('question');
+$sentences = $task->getParam('input');
 
-$inputQuestion = $question->getParam('question');
-$sentences = $question->getParam('input');
-
-$firstName = get_first_name_from_question($inputQuestion);
+$firstName = get_first_name_from_question($question);
 
 $sentences = array_filter(
     $sentences, 
     fn($sentence) => str_contains($sentence, $firstName)
 );
 
-$answer = get_answer_for_question($inputQuestion, $sentences);
+$answer = get_answer_for_question($question, $sentences);
 
 $task->sendAnswer($answer);
 

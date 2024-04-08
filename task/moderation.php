@@ -7,9 +7,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 $task = new Task('moderation');
 
-$question = $task->getQuestion();
-
-$answer = check_input_in_moderation_api($question->getParam('input'));
+$answer = check_input_in_moderation_api($task->getParam('input'));
 $answer = array_map('intval', $answer);
 
 $task->sendAnswer($answer);

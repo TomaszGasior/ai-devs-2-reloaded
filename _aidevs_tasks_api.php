@@ -10,6 +10,8 @@ class Task
 {
     protected string $token;
     protected HttpClientInterface $httpClient;
+    protected array $params;
+    protected string $msg;
 
     public function __construct(string $name)
     {
@@ -24,15 +26,26 @@ class Task
         ;
         
         $this->token = $response->toArray()['token'];
-    }
 
-    public function getQuestion(): Question
-    {
         $response = $this->httpClient
             ->request('GET', '/task/' . $this->token)
         ;
 
-        return new Question($response->toArray());
+        $this->fillInMsgAndParams($response->toArray());
+    }
+    
+    public function getMsg(): string
+    {
+        return $this->msg;
+    }
+
+    public function getParam(string $name): array|int|string
+    {
+        if (!isset($this->params[$name])) {
+            throw new WrongQuestionParamNameException($this->params);
+        }
+
+        return $this->params[$name];
     }
 
     public function sendAnswer(string|array $data): void
@@ -49,33 +62,13 @@ class Task
 
         throw new WrongAnswerException();
     }
-}
 
-class Question
-{
-    private $params;
-    private $msg;
-
-    public function __construct(array $data)
+    protected function fillInMsgAndParams(array $data): void
     {
         $this->msg = $data['msg'];
 
         unset($data['code'], $data['msg']);
         $this->params = $data;
-    }
-
-    public function getMsg(): string
-    {
-        return $this->msg;
-    }
-
-    public function getParam(string $name): array|int|string
-    {
-        if (!isset($this->params[$name])) {
-            throw new WrongQuestionParamNameException($this->params);
-        }
-
-        return $this->params[$name];
     }
 }
 

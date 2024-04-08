@@ -6,5 +6,4 @@ use AidevsTaskApi\Task;
 
 $task = new Task('helloapi');
 
-$q = $task->getQuestion();
-$task->sendAnswer($q->getParam('cookie'));
+$task->sendAnswer($task->getParam('cookie'));

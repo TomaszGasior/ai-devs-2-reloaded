@@ -52,8 +52,7 @@ function write_blog_post_using_open_ai(array $topics): array
 
 $task = new Task('blogger');
 
-$question = $task->getQuestion();
-$topics = $question->getParam('blog');
+$topics = $task->getParam('blog');
 
 $contents = write_blog_post_using_open_ai($topics);
 

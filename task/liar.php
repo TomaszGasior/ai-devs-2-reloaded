@@ -2,7 +2,6 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-use AidevsTaskApi\Question;
 use AidevsTaskApi\Task;
 use Symfony\Component\HttpClient\HttpClient;
 
@@ -44,24 +43,26 @@ function verify_question_and_answer_relevance(string $question, string $answer):
     return $data;
 }
 
-$task = new class('liar') extends Task
+$question = 'Jakie jest największe miasto w Polsce pod względem liczby ludności?';
+
+$task = new class('liar', $question) extends Task
 {
-    public function getQuestionUsingInputQuestion(string $inputQuestion): Question
+    public function __construct(string $name, string $question)
     {
+        parent::__construct($name);
+
         $response = $this->httpClient
             ->request('POST', '/task/' . $this->token, [
                 'body' => [
-                    'question' => $inputQuestion,
+                    'question' => $question,
                 ]
             ])
         ;
 
-        return new Question($response->toArray());
+        $this->fillInMsgAndParams($response->toArray());
     }
 };
 
-$inputQuestion = 'Jakie jest największe miasto w Polsce pod względem liczby ludności?';
-$question = $task->getQuestionUsingInputQuestion($inputQuestion);
 
-$answer = verify_question_and_answer_relevance($inputQuestion, $question->getParam('answer'));
+$answer = verify_question_and_answer_relevance($question, $task->getParam('answer'));
 $task->sendAnswer($answer);
