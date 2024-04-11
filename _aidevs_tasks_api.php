@@ -57,10 +57,10 @@ class Task
         ;
 
         if (200 === $response->getStatusCode()) {
-            throw new CorrectAnswerException();
+            throw new CorrectAnswerException($response->toArray());
         }
 
-        throw new WrongAnswerException();
+        throw new WrongAnswerException($response->toArray(false));
     }
 
     protected function fillInMsgAndParams(array $data): void
@@ -81,18 +81,48 @@ class WrongQuestionParamNameException extends Exception
     }
 }
 
-class CorrectAnswerException extends Exception 
+abstract class AnswerException extends Exception 
 {
-    public function __construct()
+    private array $response;
+
+    public function __construct(array $response)
     {
-        $this->message = '✅ Correct answer';
+        $this->response = $response;
+        $this->filterResponse($this->response);
+    }
+
+    public function output(): void
+    {
+        echo $this->message;
+
+        if ($this->response) {
+            echo PHP_EOL, PHP_EOL;
+            echo json_encode(
+                $this->response, 
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+            );
+        }
+        
+        echo PHP_EOL;
+    }
+
+    protected function filterResponse(array &$response): void
+    {
+        unset($response['code']);
     }
 }
 
-class WrongAnswerException extends Exception 
+class CorrectAnswerException extends AnswerException 
 {
-    public function __construct()
+    protected $message = '✅ Correct answer';
+
+    protected function filterResponse(array &$response): void
     {
-        $this->message = '❌ Wrong answer';
+        unset($response['code'], $response['msg'], $response['note']);
     }
+}
+
+class WrongAnswerException extends AnswerException 
+{
+    protected $message = '❌ Wrong answer';
 }
