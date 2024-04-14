@@ -42,7 +42,7 @@ class Task
     public function getParam(string $name): array|int|string
     {
         if (!isset($this->params[$name])) {
-            throw new WrongQuestionParamNameException($this->params);
+            throw new WrongParamNameException($this->params);
         }
 
         return $this->params[$name];
@@ -72,7 +72,7 @@ class Task
     }
 }
 
-class WrongQuestionParamNameException extends Exception
+class WrongParamNameException extends Exception
 {
     public function __construct(array $params)
     {
